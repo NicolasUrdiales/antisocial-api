@@ -10,7 +10,7 @@ const {
 
 router.get('/', getTags);
 router.get('/:id', getTagById);
-router.post('/', createTag);
+router.post('/create', createTag);
 router.put('/:id', updateTag);
 router.delete('/:id', deleteTag);
 

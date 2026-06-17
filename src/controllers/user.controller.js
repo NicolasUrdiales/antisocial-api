@@ -3,7 +3,7 @@ const Comment = require('../models/Comment');
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('nickName followers');
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los usuarios' });
@@ -66,7 +66,7 @@ const deleteUser = async (req, res) => {
 const getCommentsByUserId = async (req, res) => {
     try {
         const id = req.params.id;
-        const comentarios = await Comment.find({ user: id });
+        const comentarios = await Comment.find({ user: id }).populate('user', 'nickName').populate('post', 'description');
         res.status(200).json(comentarios);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los comentarios del usuario' });

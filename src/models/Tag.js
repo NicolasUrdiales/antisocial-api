@@ -15,4 +15,10 @@ const tagSchema = new mongoose.Schema(
     }
 )
 
+tagSchema.virtual('posts', {
+    ref: 'Post',          
+    localField: '_id',    
+    foreignField: 'tags' 
+});
+
 module.exports = mongoose.model('Tag', tagSchema)

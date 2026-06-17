@@ -12,7 +12,7 @@ const {
 router.get('/', getComments);
 router.get('/:id', getCommentById);
 
-router.post('/', createComment);
+router.post('/create', createComment);
 router.get('/post/:postId', getCommentsByPost);
 router.put('/:id', updateComment);
 router.delete('/:id', deleteComment);
