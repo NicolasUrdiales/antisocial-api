@@ -1,4 +1,3 @@
-const { model } = require('mongoose');
 const Tag = require('../models/Tag')
 
 const getTags = async (req, res) => {

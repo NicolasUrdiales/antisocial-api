@@ -1,5 +1,4 @@
-const { model } = require('mongoose');
-const { User, Comment,Post } = require('../models/User');
+const {User, Comment}= require('../models');
 
 
 const getUsers = async (req, res) => {
@@ -42,6 +41,48 @@ const createUser = async (req, res) => {
     }
 
 };
+
+const updateUser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const nickName = req.body;
+        const newUser = await User.findByIdAndUpdate(id, nickName, { new: true });
+        res.status(200).json(newUser);
+    }catch (error) {
+        res.status(500).json({message: 'Error al actualizar el usuario'});
+    }
+}
+
+
+const deleteUser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        await User.findByIdAndDelete(id);
+        res.status(204).json({message: 'Usuario eliminado'});
+    }catch (error) {
+        res.status(500).json({message: 'Error al eliminar el usuario'});
+    }
+}
+
+
+
+const getCommentsByUserId = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const comentarios = await Comment.find({ user: userId });
+        res.status(200).json(comentarios);
+    }catch (error) {
+        res.status(500).json({message: 'Error al obtener los comentarios del usuario'});
+    }
+}
+
+
+
+
+
+
+
+
 const seguirUsuario = async (req, res) => {
     try {
         const id = req.params.id;
@@ -70,4 +111,8 @@ module.exports = {
     getUserById,
     createUser,
     seguirUsuario,
+    updateUser,
+    deleteUser,
+    getCommentsByUserId,
+    
 }

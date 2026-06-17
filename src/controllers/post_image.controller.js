@@ -1,5 +1,4 @@
-const { model } = require('mongoose');
-const { PostImage } = require('../models/PostImage');
+const  PostImage = require('../models/PostImage');
 
 const getPostImages = async (req, res) => {
     try {
