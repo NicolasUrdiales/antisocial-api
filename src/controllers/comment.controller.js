@@ -19,6 +19,16 @@ const getCommentById = async (req, res) => {
     }
 }
 
+const updateComment = async (req, res) => {
+    const data = req.body;
+    try {
+        const id = req.params.id;
+        const updatedComment = await Comment.findByIdAndUpdate(id, req.body)
+    }catch(error){
+        res.status(500).json({error: error.message})
+
+    }
+}
 
 
 
@@ -54,6 +64,7 @@ module.exports = {
     createComment,
     getCommentsByPost,
     getComments,
-    getCommentById
+    getCommentById,
+    updateComment
 
 };
