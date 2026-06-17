@@ -1,26 +1,23 @@
-const {User, Comment}= require('../models');
-
+const User = require('../models/User');
+const Comment = require('../models/Comment');
 
 const getUsers = async (req, res) => {
-    try{
+    try {
         const users = await User.find();
         res.status(200).json(users);
-    }catch (error) {
-        res.status(500).json({message: 'Error al obtener los usuarios'});
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los usuarios' });
     }
 };
-
 
 const getUserById = async (req, res) => {
     try {
         const id = req.params.id;
         
-        
         const user = await User.findById(id)
             .populate('comentarios') 
-            .populate('posts', 'texto fecha') 
+            .populate('posts', 'description createdAt') 
             .populate('followers', 'nickName'); 
-
 
         res.status(200).json(user);
     } catch (error) {
@@ -30,57 +27,56 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const {nickName} = req.body;
-        const newUser = await User.create({
-            nickName
-        });
+        const { nickName } = req.body;
+        const newUser = await User.create({ nickName });
         res.status(201).json(newUser);
+    } catch (error) {
+        res.status(500).json({ message: `Error al crear el usuario: ${error.message}` });
     }
-    catch (error) {
-        res.status(500).json({message: 'Error al crear el usuario'});
-    }
-
 };
 
 const updateUser = async (req, res) => {
     try {
         const id = req.params.id;
-        const nickName = req.body;
-        const newUser = await User.findByIdAndUpdate(id, nickName, { new: true });
-        res.status(200).json(newUser);
-    }catch (error) {
-        res.status(500).json({message: 'Error al actualizar el usuario'});
-    }
-}
+        const { nickName } = req.body; 
+        
+        const updatedUser = await User.findByIdAndUpdate(
+            id, 
+            { nickName }, 
+            { new: true }
+        );
 
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: `Error al actualizar el usuario: ${error.message}` });
+    }
+};
 
 const deleteUser = async (req, res) => {
     try {
         const id = req.params.id;
         await User.findByIdAndDelete(id);
-        res.status(204).json({message: 'Usuario eliminado'});
-    }catch (error) {
-        res.status(500).json({message: 'Error al eliminar el usuario'});
+
+        res.status(200).json({ message: 'Usuario eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ message: `Error al eliminar el usuario: ${error.message}` });
     }
-}
-
-
+};
 
 const getCommentsByUserId = async (req, res) => {
     try {
         const id = req.params.id;
         const comentarios = await Comment.find({ user: id });
         res.status(200).json(comentarios);
-    }catch (error) {
-        res.status(500).json({message: 'Error al obtener los comentarios del usuario'});
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los comentarios del usuario' });
     }
-}
+};
 
 const getPostsByUserId = async (req, res) => {
     try {
         const id = req.params.id;
-        const user = await User.findById(id).populate('posts', 'texto fecha'); 
-
+        const user = await User.findById(id).populate('posts', 'description createdAt'); 
 
         res.status(200).json(user.posts);
     } catch (error) {
@@ -88,60 +84,32 @@ const getPostsByUserId = async (req, res) => {
     }
 };
 
-const dejarDeSeguirUsuario = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const idADejarDeSeguir  = req.params.idToFollow;
-
-        const miUsuario = await User.findByIdAndUpdate(id, {
-            $pull: { following: idADejarDeSeguir }
-        });
-
-        const usuarioADejarDeSeguir = await User.findByIdAndUpdate(idADejarDeSeguir, {
-            $pull: { followers: id }
-        });
-
-        res.status(200).json({ message: 'Dejaste de seguir a este usuario exitosamente' });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error al dejar de seguir al usuario', error: error.message });
-    }
-};
-
-
-
 const seguirUsuario = async (req, res) => {
     try {
         const id = req.params.id;
         const idASeguir = req.params.idASeguir;
 
-        const miUsuario = await User.findByIdAndUpdate(id, {
+        await User.findByIdAndUpdate(id, {
             $addToSet: { following: idASeguir }
         });
 
-        const usuarioAseguir = await User.findByIdAndUpdate(idASeguir, {
+        await User.findByIdAndUpdate(idASeguir, {
             $addToSet: { followers: id }
         });
 
-
         res.status(200).json({ message: 'Comenzaste a seguir a este usuario exitosamente' });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: 'Error al seguir al usuario', error: error.message });
     }
 };
-
-
-
-
 
 module.exports = {
     getUsers,
     getUserById,
     createUser,
-    seguirUsuario,
     updateUser,
     deleteUser,
     getCommentsByUserId,
-    
-}
+    getPostsByUserId,
+    seguirUsuario
+};

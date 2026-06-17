@@ -1,6 +1,5 @@
-
 const Post = require('../models/Post')
-
+const PostImage = require('../models/PostImage')
 
 const getPosts = async (req, res) => {
     try {

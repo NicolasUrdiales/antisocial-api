@@ -34,7 +34,7 @@ const updatePostImage = async (req, res) => {
 
 const createPostImage = async (req, res) => {
     try {
-        const {post_id} = req.body;
+        const {post} = req.body;
 
         if(!req.file){
             return res.status(400).json({message: 'No se ha proporcionado una imagen'});
@@ -42,7 +42,7 @@ const createPostImage = async (req, res) => {
         const urlLocal = `http://localhost:3000/${req.file.filename}`;
         const newPostImage = await PostImage.create({
             url: urlLocal,
-            post_id
+            post
         });
         
         res.status(201).json(newPostImage);
@@ -59,7 +59,7 @@ const deletePostImage = async (req, res) => {
     try {
         const id = req.params.id;
         await PostImage.findByIdAndDelete(id);
-        res.status(204).json({message: 'Post eliminado'});
+        res.status(200).json({message: 'Post eliminado'});
     }catch (error) {
         res.status(500).json({message: 'Error al eliminar el post'});
     }
