@@ -6,7 +6,7 @@ const {
     updatePostImage, 
     createPostImage,
     deletePostImage
-} = require('../controllers/post_image.controller');
+} = require('../controllers/postImage.controller');
 
 router.get('/', getPostImages);
 router.get('/:id', getPostImageById);

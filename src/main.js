@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT ?? '3000';
 const { connectToDataBase } = require('./db/mongodb');
 
-// 1. Importar todas las rutas
+
 const userRoutes = require('./routes/user.routes');
 const postRoutes = require('./routes/post.routes');
 const commentRoutes = require('./routes/comment.routes');

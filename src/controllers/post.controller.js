@@ -1,5 +1,6 @@
 const Post = require('../models/Post')
 const PostImage = require('../models/PostImage')
+const cacheManager = require('../managers/CacheManager')
 
 const getPosts = async (req, res) => {
     try {
@@ -69,6 +70,7 @@ const createPost = async (req, res) => {
             tags: tags ?? []
         })
         await newPost.save()
+        cacheManager.clear()
         res.status(201).json(newPost)
     }catch(error){
         res.status(500).json({error: error.message})
