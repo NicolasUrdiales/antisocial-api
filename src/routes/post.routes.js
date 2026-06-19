@@ -20,7 +20,7 @@ const {
 
 
 router.get('/', cache(60) ,getPosts);
-router.get('/:id', cache(60) ,validateId(), validateExists(Post), getPostByID);
+router.get('/:id', cache(60) ,validateId, validateExists(Post), getPostByID);
 router.post('/create', createPost);
 router.put('/:id',validateId,validateExists(Post), updatePost);
 router.delete('/:id',validateId, validateExists(Post), deletePost);
