@@ -18,6 +18,9 @@ const tagRoutes = require('./routes/tag.routes');
 const postImageRoutes = require('./routes/postImage.routes');
 const errorHandler = require('./middlewares/error.middleware');
 
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, '../imagenes'))); 
+
 app.use(express.json());
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

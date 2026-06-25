@@ -34,21 +34,21 @@ const updatePostImage = async (req, res) => {
 
 const createPostImage = async (req, res) => {
     try {
-        const {post} = req.body;
+        const { post } = req.body;
+        const PORT = process.env.PORT || 4002;
+        const urlLocal = `http://localhost:${PORT}/imagenes/${req.file.filename}`;
 
-        if(!req.file){
-            return res.status(400).json({message: 'No se ha proporcionado una imagen'});
-        }
-        const urlLocal = `http://localhost:3000/${req.file.filename}`;
         const newPostImage = await PostImage.create({
             url: urlLocal,
             post
         });
-        
+
         res.status(201).json(newPostImage);
-    }
-    catch (error) {
-        res.status(500).json({message: 'Error al crear el post'});
+    } catch (error) {
+        res.status(500).json({ 
+            message: 'Error al crear el post con imagen', 
+            error: error.message 
+        });
     }
 };
 
