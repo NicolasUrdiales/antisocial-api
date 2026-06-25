@@ -1,77 +1,41 @@
-const Comment = require('../models/Comment');
+const commentService = require('../services/comment.service');
+const catchAsync = require('../utils/catchAsync');
 
-const getComments = async (req, res) => {
-    try {
-        const comments = await Comment.find();
-        res.status(200).json(comments);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
+const getComments = catchAsync(async (req, res) => {
+    const comments = await commentService.getAllComments();
+    res.status(200).json(comments);
+});
 
-const getCommentById = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const comment = await Comment.findById(id)
-        res.status(200).json(comment);
-    } catch (error){
-        res.status(500).json({error: error.message})
-    }
-}
+const getCommentById = catchAsync(async (req, res) => {
+    const id = req.params.id;
+    const comment = await commentService.getCommentById(id);
+    res.status(200).json(comment);
+});
 
-const updateComment = async (req, res) => {
-    const data = req.body;
-    try {
-        const id = req.params.id;
-        const updatedComment = await Comment.findByIdAndUpdate(id, req.body)
-        res.status(200).json(updatedComment);
-    }catch(error){
-        res.status(500).json({error: error.message})
+const getCommentsByPost = catchAsync(async (req, res) => {
+    const postId = req.params.postId;
+    const comments = await commentService.getCommentsByPost(postId);
+    res.status(200).json(comments);
+});
 
-    }
-}
+const createComment = catchAsync(async (req, res) => {
+    const commentData = req.body;
+    const newComment = await commentService.createComment(commentData);
+    res.status(201).json(newComment);
+});
 
-const deleteComment = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const deletedComment = await Comment.findByIdAndDelete(id);
-        
+const updateComment = catchAsync(async (req, res) => {
+    const id = req.params.id;
+    const commentData = req.body;
+    const updatedComment = await commentService.updateComment(id, commentData);
+    res.status(200).json(updatedComment);
+});
 
-        res.status(200).json({ message: 'Comentario eliminado correctamente' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-
-
-const createComment = async (req, res) => {
-    try {
-        const newComment = new Comment(req.body);
-        await newComment.save();
-        res.status(201).json(newComment);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
-
-
-const getCommentsByPost = async (req, res) => {
-    try {
-        const monthsLimit = parseInt(process.env.MONTHS_LIMIT ?? '6');
-        const limitDate = new Date();
-        limitDate.setMonth(limitDate.getMonth() - monthsLimit);
-
-        const comments = await Comment.find({
-            post: req.params.postId,
-            createdAt: { $gte: limitDate }
-        }).populate('user', 'nickName').sort({ createdAt: -1 });
-
-        res.json(comments);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+const deleteComment = catchAsync(async (req, res) => {
+    const id = req.params.id;
+    await commentService.deleteComment(id);
+    res.status(204).json({ message: 'Comentario eliminado correctamente' });
+});
 
 module.exports = {
     createComment,

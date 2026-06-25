@@ -1,146 +1,55 @@
-const Post = require('../models/Post')
-const PostImage = require('../models/PostImage')
+const postService = require('../services/post.service')
+const catchAsync = require('../utils/catchAsync')
 cacheManager = require('../managers/CacheManager')
 
-const getPosts = async (req, res) => {
-    try {
+const getPosts = catchAsync(async (req, res) => {
+    const posts = await postService.getAllPosts()
+    res.status(200).json(posts)
+})
 
-        const limiteMeses = parseInt(process.env.MONTHS_LIMIT ?? '6')
-        const fechaLimite = new Date()
-        fechaLimite.setMonth(fechaLimite.getMonth() - limiteMeses)
+const getPostByID = catchAsync(async (req, res) => {
+    const id = req.params.id
+    const post = await postService.getPostById(id)
+    res.status(200).json(post)
+})
 
-        const posts = await Post.find()
-            .populate('user', 'nickName')
-            .populate('tags', 'name')
-            .populate('images', 'url')
-            .populate({
-                path: 'comments',
-                match: { createdAt: { $gte: fechaLimite } },
-                populate: { path: 'user', select: 'nickName' },
-                options: { sort: { createdAt: -1 } }
-            })
-            .sort({ createdAt: -1 })
+const createPost = catchAsync(async (req, res) => {
+    const postData = req.body
+    const newPost = await postService.createPost(postData)
+    cacheManager.clear()
+    res.status(201).json(newPost)
+})
 
-        res.status(200).json(posts)
+const updatePost = catchAsync(async (req, res) => {
+    const id = req.params.id
+    const postData = req.body
+    const updatedPost = await postService.updatePost(id, postData)
+    cacheManager.clear()
+    res.status(200).json(updatedPost)
+})
 
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
+const deletePost = catchAsync(async (req, res) => {
+    const id = req.params.id
+    await postService.deletePost(id)
+    cacheManager.clear()
+    res.status(204).json({ message: 'Post eliminado con éxito' })
+})
 
-}
+const agregarTagAPost = catchAsync(async (req, res) => {
+    const postId = req.params.id
+    const tagId = req.body.tagId
+    const updatedPost = await postService.addTagToPost(postId, tagId)
+    cacheManager.clear()
+    res.status(200).json(updatedPost)
+})
 
-
-
-const getPostByID = async (req, res) => {
-    try {
-        const id = req.params.id
-        const limiteMeses = parseInt(process.env.MONTHS_LIMIT ?? '6')
-        const fechaLimite = new Date()
-        fechaLimite.setMonth(fechaLimite.getMonth() - limiteMeses)
-
-        const post = await Post.findById(id)
-            .populate('user', 'nickName')
-            .populate('tags', 'name')
-            .populate('images', 'url')
-            .populate({
-                path: 'comments',
-                match: { createdAt: { $gte: fechaLimite } },
-                populate: { path: 'user', select: 'nickName' },
-                options: { sort: { createdAt: -1 } }
-            })
-            .sort({ createdAt: -1 })
-
-
-
-        res.status(200).json(post)
-
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-
-}
-
-const createPost = async (req, res) => {
-    const { description, user, tags } = req.body
-    try {
-        const newPost = new Post({
-            description,
-            user,
-            tags: tags ?? []
-        })
-        await newPost.save()
-        cacheManager.clear()
-        res.status(201).json(newPost)
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-
-    }
-
-}
-
-const updatePost = async (req, res) => {
-    try {
-        const id = req.params.id
-        const updatedPost = await Post.findByIdAndUpdate(id, req.body, { new: true })
-        cacheManager.clear()
-        res.status(200).json(updatedPost)
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-}
-
-
-
-
-
-const deletePost = async (req, res) => {
-    try {
-        const id = req.params.id
-        const deletedPost = await Post.findByIdAndDelete(id)
-        cacheManager.clear()
-        res.status(200).json(deletedPost)
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-
-}
-
-
-const agregarTagAPost = async (req, res) => {
-    try {
-        const postId = req.params.id;
-        const tagId = req.params.tagId;
-
-        const post = await Post.findByIdAndUpdate(
-            postId,
-            { $addToSet: { tags: tagId } },
-            { new: true }
-        );
-        cacheManager.clear()
-        res.status(200).json(post)
-
-
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-
-const addImageToPost = async (req, res) => {
-    try {
-        const postId = req.params.id
-        const { url } = req.body
-
-        const newImage = new PostImage({ url, post: postId })
-        await newImage.save()
-        cacheManager.clear()
-        res.status(201).json(newImage)
-
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-}
+const addImageToPost = catchAsync(async (req, res) => {
+    const postId = req.params.id
+    const { url } = req.body
+    const newImage = await postService.addImageToPost(postId, url)
+    cacheManager.clear()
+    res.status(201).json(newImage)
+})
 
 
 

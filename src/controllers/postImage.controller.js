@@ -1,69 +1,61 @@
-const  PostImage = require('../models/PostImage');
+const postImageService = require('../services/postImage.service');
+const catchAsync = require('../utils/catchAsync');
+const fs = require('fs').promises;
+const path = require('path');
 
-const getPostImages = async (req, res) => {
-    try {
-        const postImage = await PostImage.find();
-        res.status(200).json(postImage);
-    }catch (error) {
-        res.status(500).json({message: `${error.message}`});
+const getPostImages = catchAsync(async (req, res) => {
+    const postImages = await postImageService.getAllPostImages();
+    res.status(200).json(postImages);
+})
+
+const getPostImageById = catchAsync(async (req, res) => {
+    const postImage = await postImageService.getPostImageById(req.params.id);
+    res.status(200).json(postImage);
+});
+
+const createPostImage = catchAsync(async (req, res) => {
+    const { post } = req.body;
+
+    const PORT = process.env.PORT || 4002;
+    const urlLocal = `http://localhost:${PORT}/imagenes/${req.file.filename}`;
+
+    const newPostImage = await postImageService.createPostImage({
+        url: urlLocal,
+        post
+    });
+
+    res.status(201).json(newPostImage);
+});
+
+const updatePostImage = catchAsync(async (req, res) => {
+    const { url } = req.body;
+    const updatedPostImage = await postImageService.updatePostImage(req.params.id, { url });
+    res.status(200).json(updatedPostImage);
+});
+
+const deletePostImage = catchAsync(async (req, res) => {
+    const deletedPostImage = await postImageService.deletePostImage(req.params.id);
+
+    if (deletedPostImage && deletedPostImage.url) {
+        
+        const filename = deletedImage.url.split('/').pop(); 
+        
+        const filePath = path.join(__dirname, '../imagenes', filename);
+
+        try {
+            await fs.unlink(filePath);
+        } 
+        catch (err) {
+            console.error(`Aviso: No se pudo borrar el archivo físico ${filename}:`, err.message);
+        }
     }
-};
-
-
-const getPostImageById = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const postImage = await PostImage.findById(id);
-
-        res.status(200).json(postImage);
-    }catch (error) {
-        res.status(500).json({message: `Error al obtener el post`});
-    }
-};
-
-const updatePostImage = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const {url} = req.body;
-        const newPostImage = await PostImage.findByIdAndUpdate(id, {url}, {new: true});
-        res.status(200).json(newPostImage);
-    }catch (error) {
-        res.status(500).json({message: 'Error al actualizar el post'});
-    }
-}
-
-const createPostImage = async (req, res) => {
-    try {
-        const { post } = req.body;
-        const PORT = process.env.PORT || 4002;
-        const urlLocal = `http://localhost:${PORT}/imagenes/${req.file.filename}`;
-
-        const newPostImage = await PostImage.create({
-            url: urlLocal,
-            post
-        });
-
-        res.status(201).json(newPostImage);
-    } catch (error) {
-        res.status(500).json({ 
-            message: 'Error al crear el post con imagen', 
-            error: error.message 
-        });
-    }
-};
+    
+    
+    res.status(200).json({ message: 'Imagen eliminada correctamente' });
+});
 
 
 
-
-const deletePostImage = async (req, res) => {
-    try {
-        const id = req.params.id;
-        await PostImage.findByIdAndDelete(id);
-        res.status(200).json({message: 'Post eliminado'});
-    }catch (error) {
-        res.status(500).json({message: 'Error al eliminar el post'});
-    }
-}
 
 module.exports = {
     getPostImages,
