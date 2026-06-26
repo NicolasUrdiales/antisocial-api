@@ -1,5 +1,8 @@
 const { Router } = require('express');
 const router = Router();
+const Tag = require('../models/Tag');
+const { validateId, validateExists } = require('../middlewares/validaciones.middleware');
+
 const {
     getTags,
     getTagById,
@@ -9,9 +12,10 @@ const {
 } = require('../controllers/tag.controller');
 
 router.get('/', getTags);
-router.get('/:id', getTagById);
+router.get('/:id', validateId, validateExists(Tag), getTagById);
+router.post('/', createTag);
 router.post('/create', createTag);
-router.put('/:id', updateTag);
-router.delete('/:id', deleteTag);
+router.put('/:id', validateId, validateExists(Tag), updateTag);
+router.delete('/:id', validateId, validateExists(Tag), deleteTag);
 
 module.exports = router;

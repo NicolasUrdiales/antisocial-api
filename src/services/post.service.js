@@ -3,7 +3,7 @@ const PostImage = require('../models/PostImage')
 
 
 const getFechaLimite = () => {
-    const limiteMeses = parseInt(process.env.FECHA_LIMITE_MESES) || 6
+    const limiteMeses = parseInt(process.env.MONTHS_LIMIT || process.env.FECHA_LIMITE_MESES || '6')
     const fechaLimite = new Date()
     fechaLimite.setMonth(fechaLimite.getMonth() - limiteMeses)
     return fechaLimite

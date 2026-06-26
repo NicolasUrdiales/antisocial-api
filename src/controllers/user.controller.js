@@ -42,6 +42,12 @@ const seguirUsuario = catchAsync(async (req, res) => {
     const result = await userService.followUser(req.params.id, req.params.idASeguir);
     res.status(200).json(result);
 });
+
+const dejarSeguirUsuario = catchAsync(async (req, res) => {
+    const idToUnfollow = req.params.idToUnfollow || req.params.idASeguir;
+    const result = await userService.unfollowUser(req.params.id, idToUnfollow);
+    res.status(200).json(result);
+});
   
 
 
@@ -54,5 +60,6 @@ module.exports = {
     deleteUser,
     getCommentsByUserId,
     getPostsByUserId,
-    seguirUsuario
+    seguirUsuario,
+    dejarSeguirUsuario
 };

@@ -37,10 +37,17 @@ const getPostsByUserId = async (userId) => {
 }
 
 const followUser = async (userId, followId) => {
-    await User.findByIdAndUpdate(userId, { $addToSet: { followers: followId } });
+    await User.findByIdAndUpdate(userId, { $addToSet: { following: followId } });
     await User.findByIdAndUpdate(followId, { $addToSet: { followers: userId } });
     return { message: 'Comenzaste a seguir a este usuario exitosamente' };
 }
+
+const unfollowUser = async (userId, followId) => {
+    await User.findByIdAndUpdate(userId, { $pull: { following: followId } });
+    await User.findByIdAndUpdate(followId, { $pull: { followers: userId } });
+    return { message: 'Dejaste de seguir a este usuario exitosamente' };
+}
+
 
 module.exports = {
     getAllUsers,
@@ -50,5 +57,6 @@ module.exports = {
     deleteUser,
     getCommentsByUserId,
     getPostsByUserId,
-    followUser
+    followUser,
+    unfollowUser
 };

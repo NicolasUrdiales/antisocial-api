@@ -17,7 +17,7 @@ const createPostImage = catchAsync(async (req, res) => {
     const { post } = req.body;
 
     const PORT = process.env.PORT || 4002;
-    const urlLocal = `http://localhost:${PORT}/imagenes/${req.file.filename}`;
+    const urlLocal = `http://localhost:${PORT}/uploads/${req.file.filename}`;
 
     const newPostImage = await postImageService.createPostImage({
         url: urlLocal,
@@ -38,7 +38,7 @@ const deletePostImage = catchAsync(async (req, res) => {
 
     if (deletedPostImage && deletedPostImage.url) {
         
-        const filename = deletedImage.url.split('/').pop(); 
+        const filename = deletedPostImage.url.split('/').pop(); 
         
         const filePath = path.join(__dirname, '../imagenes', filename);
 

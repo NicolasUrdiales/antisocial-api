@@ -34,7 +34,7 @@ const updateComment = catchAsync(async (req, res) => {
 const deleteComment = catchAsync(async (req, res) => {
     const id = req.params.id;
     await commentService.deleteComment(id);
-    res.status(204).json({ message: 'Comentario eliminado correctamente' });
+    res.status(200).json({ message: 'Comentario eliminado correctamente' });
 });
 
 module.exports = {

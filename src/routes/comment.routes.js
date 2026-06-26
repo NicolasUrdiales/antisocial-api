@@ -1,8 +1,13 @@
-// routes/comment.routes.js
 const { Router } = require('express');
 const router = Router();
 const Comment = require('../models/Comment');
-const { validateId, validateExists } = require('../middlewares/validaciones.middleware');
+const Post = require('../models/Post');
+const User = require('../models/User');
+const {
+    validateId,
+    validateExists,
+    validateCommentBody
+} = require('../middlewares/validaciones.middleware');
 
 const { 
     getComments,      
@@ -13,14 +18,13 @@ const {
     deleteComment     
 } = require('../controllers/comment.controller');
 
-
 router.get('/', getComments);
-router.post('/', createComment);
+router.post('/', validateCommentBody, validateExists(Post, 'post'), validateExists(User, 'user'), createComment);
+router.post('/create', validateCommentBody, validateExists(Post, 'post'), validateExists(User, 'user'), createComment);
 router.get('/post/:postId', getCommentsByPost);
 
-
 router.get('/:id', validateId, validateExists(Comment), getCommentById);
-router.put('/:id', validateId, validateExists(Comment), updateComment);
+router.put('/:id', validateId, validateExists(Comment), validateCommentBody, updateComment);
 router.delete('/:id', validateId, validateExists(Comment), deleteComment);
 
 module.exports = router;
