@@ -23,7 +23,7 @@ const errorHandler = require('./middlewares/error.middleware');
 const requestLogger = require('./middlewares/logger.middleware');
 
 const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, '../imagenes'))); 
+app.use('/uploads', express.static(path.join(__dirname, './imagenes'))); 
 
 app.use(requestLogger);
 app.use(express.json());

@@ -14,12 +14,14 @@ const getAllUsers = async (nickName) => {
 const getUserById = async (id) => await User.findById(id)
     .populate('comentarios') 
     .populate('posts', 'description createdAt') 
-    .populate('followers', 'nickName');
+    .populate('followers', 'nickName')
+    .populate('following', 'nickName');
 
 const getUserByNickName = async (nickName) => await User.findOne({ nickName })
     .populate('comentarios') 
     .populate('posts', 'description createdAt') 
-    .populate('followers', 'nickName');
+    .populate('followers', 'nickName')
+    .populate('following', 'nickName');
 
 
 
@@ -52,6 +54,8 @@ const getPostsByUserId = async (userId) => {
     return user ? user.posts : [];
 }
 
+const bcrypt = require('bcryptjs');
+
 const followUser = async (userId, followId) => {
     await User.findByIdAndUpdate(userId, { $addToSet: { following: followId } });
     await User.findByIdAndUpdate(followId, { $addToSet: { followers: userId } });
@@ -62,6 +66,21 @@ const unfollowUser = async (userId, followId) => {
     await User.findByIdAndUpdate(userId, { $pull: { following: followId } });
     await User.findByIdAndUpdate(followId, { $pull: { followers: userId } });
     return { message: 'Dejaste de seguir a este usuario exitosamente' };
+}
+
+const loginUser = async (nickName, password) => {
+    const user = await User.findOne({ nickName })
+        .populate('comentarios') 
+        .populate('posts', 'description createdAt') 
+        .populate('followers', 'nickName')
+        .populate('following', 'nickName');
+    
+    if (!user) return null;
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return null;
+    
+    return user;
 }
 
 
@@ -75,5 +94,6 @@ module.exports = {
     getCommentsByUserId,
     getPostsByUserId,
     followUser,
-    unfollowUser
+    unfollowUser,
+    loginUser
 };

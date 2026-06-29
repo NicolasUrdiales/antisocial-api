@@ -5,7 +5,10 @@ const cacheManager = require('../managers/CacheManager')
 const Tag = require('../models/Tag')
 
 const getPosts = catchAsync(async (req, res) => {
-    const posts = await postService.getAllPosts()
+    const page = parseInt(req.query.page || '1')
+    const limit = parseInt(req.query.limit || '10')
+    const tag = req.query.tag || null
+    const posts = await postService.getAllPosts(page, limit, tag)
     res.status(200).json(posts)
 })
 

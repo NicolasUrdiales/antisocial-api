@@ -17,12 +17,14 @@ const {
     getCommentsByUserId,
     getPostsByUserId,
     seguirUsuario,
-    dejarSeguirUsuario
+    dejarSeguirUsuario,
+    loginUsuario
 } = require('../controllers/user.controller');
 
 router.get('/', getUsers);
 router.get('/:id', validateId, validateExists(User), getUserById);
 
+router.post('/login', loginUsuario);
 router.post('/', validateUserBody, createUser);
 router.post('/create', validateUserBody, createUser);
 

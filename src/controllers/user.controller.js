@@ -58,6 +58,15 @@ const dejarSeguirUsuario = catchAsync(async (req, res) => {
     const result = await userService.unfollowUser(req.params.id, idToUnfollow);
     res.status(200).json(result);
 });
+
+const loginUsuario = catchAsync(async (req, res) => {
+    const { nickName, password } = req.body;
+    const user = await userService.loginUser(nickName, password);
+    if (!user) {
+        return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    }
+    res.status(200).json(user);
+});
   
 
 
@@ -72,5 +81,6 @@ module.exports = {
     getCommentsByUserId,
     getPostsByUserId,
     seguirUsuario,
-    dejarSeguirUsuario
+    dejarSeguirUsuario,
+    loginUsuario
 };
