@@ -1,11 +1,22 @@
 const User = require('../models/User')
 const Comment = require('../models/Comment')
 
-const getAllUsers = async () => await User.find()
-    .populate('nickName followers')
-    .populate('nickName following')
+const getAllUsers = async (nickName) => {
+    const filter = {};
+    if (nickName) {
+        filter.nickName = nickName;
+    }
+    return await User.find(filter)
+        .populate('nickName followers')
+        .populate('nickName following');
+};
 
 const getUserById = async (id) => await User.findById(id)
+    .populate('comentarios') 
+    .populate('posts', 'description createdAt') 
+    .populate('followers', 'nickName');
+
+const getUserByNickName = async (nickName) => await User.findOne({ nickName })
     .populate('comentarios') 
     .populate('posts', 'description createdAt') 
     .populate('followers', 'nickName');
@@ -16,11 +27,16 @@ const getUserById = async (id) => await User.findById(id)
 
 const createUser = async (userData) => await User.create(userData);
 
-const updateUser = async (id, userData) => await User.findByIdAndUpdate(
-    id, 
-    userData, 
-    { new: true }
-);
+const updateUser = async (id, userData) => {
+    const user = await User.findById(id);
+    if (!user) return null;
+    for (const key in userData) {
+        if (userData.hasOwnProperty(key)) {
+            user[key] = userData[key];
+        }
+    }
+    return await user.save();
+};
 
 const deleteUser = async (id) => await User.findByIdAndDelete(id);
 
@@ -52,6 +68,7 @@ const unfollowUser = async (userId, followId) => {
 module.exports = {
     getAllUsers,
     getUserById,
+    getUserByNickName,
     createUser,
     updateUser,
     deleteUser,

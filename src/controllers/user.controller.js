@@ -2,13 +2,23 @@ const userService = require('../services/user.service');
 const catchAsync = require('../utils/catchAsync');
 
 const getUsers = catchAsync(async (req, res) => {
-    const users = await userService.getAllUsers();
+    const { nickName } = req.query;
+    const users = await userService.getAllUsers(nickName);
     res.status(200).json(users);
 });
 
 const getUserById = catchAsync(async (req, res) => {
     const id = req.params.id;
     const user = await userService.getUserById(id);
+    res.status(200).json(user);
+});
+
+const getUserByNickName = catchAsync(async (req, res) => {
+    const { nickName } = req.params;
+    const user = await userService.getUserByNickName(nickName);
+    if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
     res.status(200).json(user);
 });
 
@@ -55,6 +65,7 @@ const dejarSeguirUsuario = catchAsync(async (req, res) => {
 module.exports = {
     getUsers,
     getUserById,
+    getUserByNickName,
     createUser,
     updateUser,
     deleteUser,

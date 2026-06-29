@@ -12,9 +12,16 @@ paths:
   /users:
     get:
       summary: "Obtener todos los usuarios"
-      description: "Retorna una lista con todos los usuarios registrados en el sistema."
+      description: "Retorna una lista con todos los usuarios registrados en el sistema, opcionalmente filtrada por nickName."
       tags:
         - Users
+      parameters:
+        - in: query
+          name: nickName
+          required: false
+          schema:
+            type: string
+          description: "Filtrar por nickName de usuario"
       responses:
         '200':
           description: "Lista de usuarios devuelta exitosamente"
@@ -91,7 +98,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserRequest'
+              $ref: '#/components/schemas/UpdateUserRequest'
       responses:
         '200':
           description: "Usuario actualizado exitosamente"
@@ -122,6 +129,29 @@ paths:
           description: "Usuario eliminado correctamente"
         '400':
           description: "Formato de ID inválido"
+        '404':
+          description: "Usuario no encontrado"
+
+  /user/{nickName}:
+    get:
+      summary: "Obtener un usuario por nickName"
+      description: "Retorna los detalles de un usuario específico buscando por su nickName único, incluyendo sus posts, comentarios y seguidores."
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: nickName
+          required: true
+          schema:
+            type: string
+          description: "El nickName del usuario a buscar"
+      responses:
+        '200':
+          description: "Usuario devuelto exitosamente"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
         '404':
           description: "Usuario no encontrado"
 
@@ -943,6 +973,7 @@ components:
       required:
         - id
         - nickName
+        - password
       properties:
         id:
           type: string
@@ -950,6 +981,9 @@ components:
         nickName:
           type: string
           example: "juanperez"
+        password:
+          type: string
+          example: "$2b$10$mm9Q1yt4baGR28/VDAiXMev4aHYe2tjEaSHTbp3C1UlE1I7jD2KA6"
         followers:
           type: array
           items:
@@ -964,6 +998,7 @@ components:
       required:
         - id
         - nickName
+        - password
       properties:
         id:
           type: string
@@ -971,6 +1006,9 @@ components:
         nickName:
           type: string
           example: "juanperez"
+        password:
+          type: string
+          example: "$2b$10$mm9Q1yt4baGR28/VDAiXMev4aHYe2tjEaSHTbp3C1UlE1I7jD2KA6"
         followers:
           type: array
           items:
@@ -1004,12 +1042,30 @@ components:
       type: object
       required:
         - nickName
+        - password
       properties:
         nickName:
           type: string
           minLength: 5
           maxLength: 30
           example: "juanperez"
+        password:
+          type: string
+          minLength: 6
+          example: "secreto123"
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        nickName:
+          type: string
+          minLength: 5
+          maxLength: 30
+          example: "juanperez"
+        password:
+          type: string
+          minLength: 6
+          example: "secreto123"
 
     Post:
       type: object

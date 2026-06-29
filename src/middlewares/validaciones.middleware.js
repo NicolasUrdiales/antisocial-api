@@ -36,12 +36,31 @@ const validateIdParam = (paramKey) => {
 };
 
 const validateUserBody = (req, res, next) => {
-    const { nickName } = req.body;
+    const { nickName, password } = req.body;
     if (!nickName || typeof nickName !== 'string' || nickName.trim() === '') {
         return res.status(400).json({ error: 'El nickName es obligatorio' });
     }
     if (nickName.length < 5 || nickName.length > 30) {
         return res.status(400).json({ error: 'El nickName debe tener entre 5 y 30 caracteres' });
+    }
+
+    const isCreate = req.method === 'POST';
+    if (isCreate) {
+        if (!password || typeof password !== 'string' || password.trim() === '') {
+            return res.status(400).json({ error: 'La contraseña es obligatoria' });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+        }
+    } else {
+        if (password !== undefined) {
+            if (typeof password !== 'string' || password.trim() === '') {
+                return res.status(400).json({ error: 'La contraseña no puede estar vacía' });
+            }
+            if (password.length < 6) {
+                return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+            }
+        }
     }
     next();
 };

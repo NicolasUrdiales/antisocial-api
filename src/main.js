@@ -1,9 +1,12 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const cors = require('cors');
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
+
 const PORT = process.env.PORT ?? '3000';
 const { connectToDataBase } = require('./db/mongodb');
 const swaggerUi = require('swagger-ui-express');
@@ -27,7 +30,10 @@ app.use(express.json());
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
+const { getUserByNickName } = require('./controllers/user.controller');
+
 app.use('/users', userRoutes);
+app.get('/user/:nickName', getUserByNickName);
 app.use('/posts', postRoutes);
 app.use('/comments', commentRoutes);
 app.use('/tags', tagRoutes);
